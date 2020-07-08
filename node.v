@@ -11,6 +11,7 @@ pub enum Type {
 	datetime
 	array
 	object
+	array_object
 }
 
 pub type Value = bool | f64 | int | string | time.Time
@@ -33,9 +34,10 @@ pub fn new_node(name string, typ Type, val Value) &Node {
 		name: name
 		typ: typ
 		val: val
+		parent:0
 		pre: 0
 		next: 0
-		child: 0
+		first_child: 0
 	}
 	return &n
 }

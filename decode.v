@@ -3,28 +3,30 @@ module toml
 import os
 
 pub struct Decoder {
+pub:
+	text          string // toml text
 pub mut:
-	text          string
-	lines         []string
-	root          Node // the root of node
-	// the following are temp field
+	lines         []string // split toml text to lines
+	root          Node // the root of Node
+	// temp field
 	parent        &Node
 	pre           &Node
 	current_group string
 }
 
+// decode toml file to target varible
 pub fn decode_file(path string, target voidptr) ? {
-	a_path := get_abs_path(path)
-	if !os.exists(a_path) {
+	abs_path := get_abs_path(path)
+	if !os.exists(abs_path) {
 		return error('$path is not exists')
 	}
-	text := os.read_file(a_path) or {
-		return error('read file $a_path failed')
+	text := os.read_file(abs_path) or {
+		return error('read file $abs_path failed')
 	}
 	return decode(text, target)
 }
 
-// the same with json.decode
+// decode toml string to target varible
 pub fn decode(text string, target voidptr) ? {
 	mut d := Decoder{
 		text: text
@@ -32,20 +34,41 @@ pub fn decode(text string, target voidptr) ? {
 		root: Node{
 			typ: Type.root
 			name: 'root'
+			parent: 0
 			pre: 0
 			next: 0
-			child: 0
+			first_child: 0
 		}
+		parent: 0
+		pre: 0
 	}
 	d.decode()
 	d.scan_to(target)
 }
-//decode the text to Node chain
-fn (d Decoder) decode() {
+
+// decode the text to Node chain
+fn (mut d Decoder) decode() {
+	d.lines = d.text.split('\n')
+	d.remove_empty_and_comment_line()
+	println(d.lines)
+}
+
+fn (mut d Decoder) remove_empty_and_comment_line() {
+	mut new_lines := []string{}
+	for line in d.lines {
+		trim_line := line.trim_space()
+		if trim_line == '' || trim_line.starts_with('#') {
+			continue
+		} else {
+			new_lines << trim_line
+		}
+	}
+	d.lines = new_lines
+	
 }
 
 // scan the Node chain to target varible
-fn (d Decode) scan_to(target voidptr) {
+fn (mut d Decoder) scan_to(target voidptr) {
 }
 
 // get absolute path for file

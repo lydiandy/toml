@@ -4,5 +4,5 @@ pub struct Encoder {
 }
 
 // the same with json.encode
-pub fn encode(obj interface) ?string {
+pub fn encode(obj voidptr) ?string {
 }

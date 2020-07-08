@@ -31,10 +31,10 @@ struct Jwt {
 }
 
 fn main() {
-	file := './dev_config.toml'
+	file := 'dev_config.toml'
 	mut config := Config{}
 	toml.decode_file(file, &config) or {
 		panic('read config file failed:$err ')
 	}
-	println(config)
+	// println(config)
 }
