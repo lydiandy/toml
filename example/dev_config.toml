@@ -21,8 +21,18 @@ password = ""
 [jwt]
 jwt_key = "key"
 jwt_cookie =""
+sub_array = [
+    1,
+    2,
+    3
+]
 
-
+#array
+my_array=[
+    'a',
+    'b',
+    'c',
+]
 
 
 
