@@ -54,7 +54,8 @@ fn (mut d Decoder) decode() {
 	d.parse_line()
 	println(d.lines)
 }
-//remove empty line and comment line
+
+// remove empty line and comment line
 fn (mut d Decoder) remove_empty_and_comment_line() {
 	mut new_lines := []string{}
 	for line in d.lines {
@@ -66,37 +67,33 @@ fn (mut d Decoder) remove_empty_and_comment_line() {
 		}
 	}
 	d.lines = new_lines
-	
 }
-//because of some statement can write mulit line,for example array,
-//make multi line to one line,make sure one line generate one Node
+
+// because of some statement can write mulit line,for example array,
+// make multi line to one line,make sure one line generate one Node
 fn (mut d Decoder) merge_multi_line() {
-	mut new_lines:=[]string{}
-	for i:=0; i<d.lines.len;i++ {
+	mut new_lines := []string{}
+	for i := 0; i < d.lines.len; i++ {
 		if d.lines[i].ends_with('[') {
-			mut merge_line:=''
-			for j:=i;j<d.lines.len;j++ {
+			mut merge_line := ''
+			for j := i; j < d.lines.len; j++ {
 				merge_line += d.lines[j]
-				if d.lines[j].starts_with(']') { 
-					i=j
+				if d.lines[j].starts_with(']') {
+					i = j
 					break
 				}
 			}
 			new_lines << merge_line
-
-			
 		} else {
 			new_lines << d.lines[i]
 		}
-		
 	}
-	d.lines=new_lines
+	d.lines = new_lines
 }
-//parse each line,one line generate one Node and under root Node
+
+// parse each line,one line generate one Node and under root Node
 fn (mut d Decoder) parse_line() {
-
 }
-
 
 // scan the Node chain to target varible
 fn (mut d Decoder) scan_to(target voidptr) {
