@@ -49,7 +49,7 @@ pub fn (mut s Scanner) scan() Token {
 			return s.new_token(.comma, '', 1)
 		}
 		else {
-			println('known token')
+			println('unknown token')
 		}
 	}
 }
