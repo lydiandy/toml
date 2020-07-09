@@ -19,7 +19,6 @@ pub mut:
 	token          Token
 	next_token     Token
 	next_token2    Token
-	in_string      bool
 	//
 	current_parent &Node
 	current_pre    &Node
@@ -45,7 +44,6 @@ pub fn decode(text string, target voidptr) ? {
 		nodes: []Node{}
 		current_parent: 0
 		current_pre: 0
-		in_string: false
 	}
 	root := Node{
 		typ: Type.object
