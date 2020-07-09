@@ -2,7 +2,7 @@ module toml
 
 pub struct Token {
 	kind    Kind
-	val     string  //only string,integer,float,datetime have val
+	val     Value  //only string,integer,float,datetime have val
 	len 	int
 }
 

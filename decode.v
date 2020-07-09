@@ -123,6 +123,7 @@ fn (mut d Decoder) parse_line(line string) {
 	d.read_first_token()
 	for {
 		if d.token.kind == .eol {
+			println('end of line')
 			break
 		}
 		match d.token.kind {
@@ -187,8 +188,8 @@ fn (mut d Decoder) ident_bool_true() {
 		val: true
 		parent: d.current_parent
 		pre: d.current_pre
-		next:0
-		child:0
+		next: 0
+		child: 0
 	}
 	d.nodes << node
 	d.current_pre.next = &node
@@ -204,8 +205,8 @@ fn (mut d Decoder) ident_bool_false() {
 		val: false
 		parent: &d.current_parent
 		pre: d.current_pre
-		next:0
-		child:0
+		next: 0
+		child: 0
 	}
 	d.nodes << node
 	d.current_pre.next = &node
@@ -251,6 +252,12 @@ fn (mut d Decoder) end_of_line() {
 
 // scan the Node chain to target varible
 fn (mut d Decoder) scan_to(target voidptr) {
+}
+
+//
+[inline]
+pub fn is_name_char(c byte) bool {
+	return (c >= `a` && c <= `z`) || (c >= `A` && c <= `Z`) || c == `_`
 }
 
 // get absolute path for file

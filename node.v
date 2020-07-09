@@ -15,6 +15,30 @@ pub enum Type {
 
 pub type Value = bool | f64 | int | string | time.Time
 
+pub fn (v Value) str() string {
+	match v {
+		bool {
+			if v {
+				return 'true'
+			} else {
+				return 'false'
+			}
+		}
+		f64 {
+			return v.str()
+		}
+		int {
+			return v.str()
+		}
+		string {
+			return v
+		}
+		time.Time {
+			return v.str()
+		}
+	}
+}
+
 // use chain to save the parse result
 pub struct Node {
 pub mut:
