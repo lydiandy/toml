@@ -5,7 +5,7 @@ pub struct Scanner {
 pub mut:
 	text             string
 	pos              int
-	is_inside_string bool
+	// is_inside_string bool
 	is_started       bool
 }
 
@@ -28,21 +28,32 @@ pub fn (mut s Scanner) scan() Token {
 	c := s.text[s.pos]
 	nextc := s.look_ahead(1)
 	nextc2 := s.look_ahead(2)
+	// ident name
 	if is_name_char(c) {
 		name := s.ident_name()
 		match name {
-			'true' {
-				return s.new_token(.bool_true, true, 4)
-			}
-			'false' {
-				return s.new_token(.bool_false, false, 5)
-			}
-			else {
-				return s.new_token(.name, name, name.len)
-			}
+			'true' { return s.new_token(.bool_true, true, 4) }
+			'false' { return s.new_token(.bool_false, false, 5) }
+			else { return s.new_token(.name, name, name.len) }
 		}
 	}
+	// ident string
+	if s.text[s.pos] == single_quote {
+		ident_string := s.ident_string(single_quote)
+		return s.new_token(.string, ident_string, ident_string.len + 2)
+	}
+	if s.text[s.pos] == double_quote {
+		ident_string := s.ident_string(double_quote)
+		return s.new_token(.string, ident_string, ident_string.len + 2)
+	}
+	// other char
 	match c {
+		// single_quote {
+		// 	// if nextc == `"` && nextc2 == `"` {
+		// 	// return s.new_token(.three_double_quote, '', 3)
+		// 	// }
+		// }
+		// double_quote {}
 		`=` {
 			return s.new_token(.eq, '', 1)
 		}
@@ -65,11 +76,6 @@ pub fn (mut s Scanner) scan() Token {
 		}
 		`.` {
 			return s.new_token(.dot, '', 1)
-		}
-		`"` {
-			if nextc == `"` && nextc2 == `"` {
-				return s.new_token(.three_double_quote, '', 3)
-			}
 		}
 		else {
 			println('unknown token')
@@ -104,6 +110,18 @@ fn (mut s Scanner) ident_name() string {
 	name := s.text[start..s.pos]
 	s.pos--
 	return name
+}
+
+// ident string
+fn (mut s Scanner) ident_string(quote byte) string {
+	s.pos++
+	start := s.pos
+	for s.pos < s.text.len && s.text[s.pos] != quote {
+		s.pos++
+	}
+	ident_string := s.text[start..s.pos]
+	s.pos--
+	return ident_string
 }
 
 [inline]
