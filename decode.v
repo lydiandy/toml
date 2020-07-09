@@ -13,16 +13,21 @@ pub:
 	text           string // toml text
 pub mut:
 	lines          []string // split toml text to lines
-	root           &Node // the root of Node
+	nodes          []Node // all nodes are stored here,the first one is root node
+	scanner        &Scanner // when scanner new line the scanner will be new one
 	// temp field
+	token          Token
+	next_token     Token
+	next_token2    Token
+	in_string      bool
+	//
 	current_parent &Node
 	current_pre    &Node
-	in_string      bool
 }
 
 // decode toml file to target varible
-pub fn decode_file(path string, target voidptr) ? {
-	abs_path := get_abs_path(path)
+pub fn decode_file(file string, target voidptr) ? {
+	abs_path := get_abs_path(file)
 	if !os.exists(abs_path) {
 		return error('$path is not exists')
 	}
@@ -37,20 +42,24 @@ pub fn decode(text string, target voidptr) ? {
 	mut d := Decoder{
 		text: text
 		lines: []string{}
-		root: &Node{
-			typ: Type.object
-			name: 'root'
-			parent: 0
-			pre: 0
-			next: 0
-			child: 0
-		}
+		nodes: []Node{}
 		current_parent: 0
 		current_pre: 0
 		in_string: false
 	}
+	root := Node{
+		typ: Type.object
+		name: 'root'
+		parent: 0
+		pre: 0
+		next: 0
+		child: 0
+	}
+	nodes << root
 	d.current_parent = d.root
+	// start to decode
 	d.decode()
+	// scan to target variable
 	d.scan_to(target)
 }
 
@@ -59,8 +68,7 @@ fn (mut d Decoder) decode() {
 	d.lines = d.text.split('\n')
 	d.remove_empty_and_comment_line()
 	d.merge_multi_line()
-	d.parse_line()
-	println(d.lines)
+	d.parse_lines()
 }
 
 // remove empty line and comment line
@@ -99,31 +107,144 @@ fn (mut d Decoder) merge_multi_line() {
 	d.lines = new_lines
 }
 
-// parse each line,one line generate one Node and under root Node
-fn (mut d Decoder) parse_line() {
-	for line in d.lines {
-		// mut pos := 0 // current pos
-		// for pos
-		// mut c, nextc := line[pos], line[pos + 1]
-		// match c {
-		// 	'[' {
-		// 		// if nextc == '[' {
-		// 		// } else {
-		// 		// }
-		// 	}
-		// 	double_quote {}
-		// 	'=' {}
-		// 	'#' {}
-		// 	'.' {}
-		// 	else {
-		// 		println('unknown c')
-		// 	}
-		// }
+fn (mut d Dccoder) parse_lines() {
+	for i := 0; i < d.lines.len; i++ {
+		line := d.lines[i]
+		d.parse_line(line)
 	}
-	println(d.root.name)
 }
 
-fn end_of_line() {
+// parse each line,one line generate one Node and under root Node
+fn (mut d Decoder) parse_line(line string) {
+	d.reset_temp_varible()
+	d.scanner = &Scanner{
+		text: line
+		pos: 0
+	}
+	d.read_first_token()
+	for {
+		if d.token == .eol {
+			break
+		}
+		match d.token {
+			.name {
+				if d.next_token == .eq {
+					match d.next_token2 {
+						.string { d.ident_string() }
+						.bool_true { d.ident_bool_true() }
+						.bool_false { d.ident_bool_false() }
+						.integer { d.ident_integer() }
+						.float { d.ident_float() }
+						.datetime { d.ident_datetime() }
+						.lsbr { d.ident_array() }
+						.three_single_quote { d.ident_three_single_quote() }
+						.three_double_quote { d.ident_three_double_quote() }
+						else { println('known node') }
+					}
+				}
+			}
+			.lsbr {
+				d.ident_group()
+			}
+			.double_lsbr {
+				d.ident_array_of_object()
+			}
+			eles {
+				println('known node')
+			}
+		}
+	}
+}
+
+fn (mut d Decoder) reset_temp_varible() {
+	d.token = Token{}
+	d.next_token = Token{}
+	d.next_token2 = Token{}
+	d.in_string = false
+}
+
+// the first time,init the token,next_token,next_token2
+fn (mut d Decoder) read_first_token() {
+	d.next()
+	d.next()
+	d.next()
+}
+
+// next token
+fn (mut d Decoder) next() {
+	d.token = d.next_token
+	d.next_token = d.next_token
+	d.next_token2 = d.scanner.scan()
+}
+
+// identify string
+fn (mut d Decoder) indent_string() {
+}
+
+// identify bool true
+fn (mut d Decoder) ident_bool_true() {
+	node := Node{
+		typ: .bool_true
+		name: d.token.val
+		val: true
+		parent: d.current_parent
+		pre: d.current_pre
+	}
+	d.nodes << node
+	d.current_pre.next = node
+	d.current_pre = node
+	d.next()
+}
+
+// identify bool false
+fn (mut d Decoder) ident_bool_false() {
+	node := Node{
+		typ: .bool_false
+		name: d.token.val
+		val: false
+		parent: d.current_parent
+		pre: d.current_pre
+	}
+	d.nodes << node
+	d.current_pre.next = node
+	d.current_pre = node
+	d.next()
+}
+
+// identify integer
+fn (mut d Decoder) ident_integer() {
+}
+
+// identify float
+fn (mut d Decoder) indent_float() {
+}
+
+// identify datetime
+fn (mut d Decoder) ident_datetime() {
+}
+
+// identify array
+fn (mut d Decoder) ident_array() {
+}
+
+// identify three_single_quote
+fn (mut d Decoder) ident_three_single_quote() {
+}
+
+// identify three_double_quote
+fn (mut d Decoder) ident_three_double_quote() {
+}
+
+// identify group
+fn (mut d Decoder) ident_group() {
+}
+
+// identify array_of_object
+fn (mut d Decoder) ident_array_of_object() {
+}
+
+// reach end of line
+fn (mut d Decoder) end_of_line() {
 }
 
 // scan the Node chain to target varible
