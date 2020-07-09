@@ -3,10 +3,10 @@ module toml
 // for scan each line and generate tokens
 pub struct Scanner {
 pub mut:
-	text             string
-	pos              int
-	// is_inside_string bool
-	is_started       bool
+	text       string
+	pos        int
+	is_inside_string bool
+	is_started bool
 }
 
 // scan once generate one token
@@ -38,22 +38,22 @@ pub fn (mut s Scanner) scan() Token {
 		}
 	}
 	// ident string
-	if s.text[s.pos] == single_quote {
+	if c == single_quote {
 		ident_string := s.ident_string(single_quote)
 		return s.new_token(.string, ident_string, ident_string.len + 2)
 	}
-	if s.text[s.pos] == double_quote {
+	if c == double_quote {
 		ident_string := s.ident_string(double_quote)
 		return s.new_token(.string, ident_string, ident_string.len + 2)
+	}
+	// ident number
+	if c.is_digit() || (c == `.` && nextc.is_digit()) {
+		num := s.ident_number()
+		return s.new_token(.number, num, num.len)
 	}
 	// other char
 	match c {
 		// single_quote {
-		// 	// if nextc == `"` && nextc2 == `"` {
-		// 	// return s.new_token(.three_double_quote, '', 3)
-		// 	// }
-		// }
-		// double_quote {}
 		`=` {
 			return s.new_token(.eq, '', 1)
 		}
@@ -122,6 +122,254 @@ fn (mut s Scanner) ident_string(quote byte) string {
 	ident_string := s.text[start..s.pos]
 	s.pos--
 	return ident_string
+}
+
+// ident number
+fn filter_num_sep(txt byteptr, start, end int) string {
+	unsafe {
+		mut b := malloc(end - start + 1) // add a byte for the endstring 0
+		mut i1 := 0
+		for i := start; i < end; i++ {
+			if txt[i] != num_sep {
+				b[i1] = txt[i]
+				i1++
+			}
+		}
+		b[i1] = 0 // C string compatibility
+		return string(b)
+	}
+}
+
+fn (mut s Scanner) ident_bin_number() string {
+	mut has_wrong_digit := false
+	mut first_wrong_digit_pos := 0
+	mut first_wrong_digit := `\0`
+	start_pos := s.pos
+	s.pos += 2 // skip '0b'
+	for s.pos < s.text.len {
+		c := s.text[s.pos]
+		if !c.is_bin_digit() && c != num_sep {
+			if (!c.is_digit() && !c.is_letter()) || s.is_inside_string {
+				break
+			} else if !has_wrong_digit {
+				has_wrong_digit = true
+				first_wrong_digit_pos = s.pos
+				first_wrong_digit = c
+			}
+		}
+		s.pos++
+	}
+	if start_pos + 2 == s.pos {
+		s.pos-- // adjust error position
+		error('number part of this binary is not provided')
+	} else if has_wrong_digit {
+		s.pos = first_wrong_digit_pos // adjust error position
+		error('this binary number has unsuitable digit `$first_wrong_digit.str()`')
+	}
+	number := filter_num_sep(s.text.str, start_pos, s.pos)
+	s.pos--
+	return number
+}
+
+fn (mut s Scanner) ident_hex_number() string {
+	mut has_wrong_digit := false
+	mut first_wrong_digit_pos := 0
+	mut first_wrong_digit := `\0`
+	start_pos := s.pos
+	s.pos += 2 // skip '0x'
+	for s.pos < s.text.len {
+		c := s.text[s.pos]
+		if !c.is_hex_digit() && c != num_sep {
+			if !c.is_letter() || s.is_inside_string {
+				break
+			} else if !has_wrong_digit {
+				has_wrong_digit = true
+				first_wrong_digit_pos = s.pos
+				first_wrong_digit = c
+			}
+		}
+		s.pos++
+	}
+	if start_pos + 2 == s.pos {
+		s.pos-- // adjust error position
+		error('number part of this hexadecimal is not provided')
+	} else if has_wrong_digit {
+		s.pos = first_wrong_digit_pos // adjust error position
+		error('this hexadecimal number has unsuitable digit `$first_wrong_digit.str()`')
+	}
+	number := filter_num_sep(s.text.str, start_pos, s.pos)
+	s.pos--
+	return number
+}
+
+fn (mut s Scanner) ident_oct_number() string {
+	mut has_wrong_digit := false
+	mut first_wrong_digit_pos := 0
+	mut first_wrong_digit := `\0`
+	start_pos := s.pos
+	s.pos += 2 // skip '0o'
+	for s.pos < s.text.len {
+		c := s.text[s.pos]
+		if !c.is_oct_digit() && c != num_sep {
+			if (!c.is_digit() && !c.is_letter()) || s.is_inside_string {
+				break
+			} else if !has_wrong_digit {
+				has_wrong_digit = true
+				first_wrong_digit_pos = s.pos
+				first_wrong_digit = c
+			}
+		}
+		s.pos++
+	}
+	if start_pos + 2 == s.pos {
+		s.pos-- // adjust error position
+		error('number part of this octal is not provided')
+	} else if has_wrong_digit {
+		s.pos = first_wrong_digit_pos // adjust error position
+		error('this octal number has unsuitable digit `$first_wrong_digit.str()`')
+	}
+	number := filter_num_sep(s.text.str, start_pos, s.pos)
+	s.pos--
+	return number
+}
+
+fn (mut s Scanner) ident_dec_number() string {
+	mut has_wrong_digit := false
+	mut first_wrong_digit_pos := 0
+	mut first_wrong_digit := `\0`
+	start_pos := s.pos
+	// scan integer part
+	for s.pos < s.text.len {
+		c := s.text[s.pos]
+		if !c.is_digit() && c != num_sep {
+			if !c.is_letter() || c in [`e`, `E`] || s.is_inside_string {
+				break
+			} else if !has_wrong_digit {
+				has_wrong_digit = true
+				first_wrong_digit_pos = s.pos
+				first_wrong_digit = c
+			}
+		}
+		s.pos++
+	}
+	mut call_method := false // true for, e.g., 5.str(), 5.5.str(), 5e5.str()
+	mut is_range := false // true for, e.g., 5..10
+	mut is_float_without_fraction := false // true for, e.g. 5.
+	// scan fractional part
+	if s.pos < s.text.len && s.text[s.pos] == `.` {
+		s.pos++
+		if s.pos < s.text.len {
+			// 5.5, 5.5.str()
+			if s.text[s.pos].is_digit() {
+				for s.pos < s.text.len {
+					c := s.text[s.pos]
+					if !c.is_digit() {
+						if !c.is_letter() || c in [`e`, `E`] || s.is_inside_string {
+							// 5.5.str()
+							if c == `.` && s.pos + 1 < s.text.len && s.text[s.pos + 1].is_letter() {
+								call_method = true
+							}
+							break
+						} else if !has_wrong_digit {
+							has_wrong_digit = true
+							first_wrong_digit_pos = s.pos
+							first_wrong_digit = c
+						}
+					}
+					s.pos++
+				}
+			} else if s.text[s.pos] == `.` {
+				// 5.. (a range)
+				is_range = true
+				s.pos--
+			} else if s.text[s.pos] in [`e`, `E`] {
+				// 5.e5
+			} else if s.text[s.pos].is_letter() {
+				// 5.str()
+				call_method = true
+				s.pos--
+			} else if s.text[s.pos] != `)` {
+				// 5.
+				is_float_without_fraction = true
+				s.pos--
+			}
+		}
+	}
+	// scan exponential part
+	mut has_exp := false
+	if s.pos < s.text.len && s.text[s.pos] in [`e`, `E`] {
+		has_exp = true
+		s.pos++
+		if s.pos < s.text.len && s.text[s.pos] in [`-`, `+`] {
+			s.pos++
+		}
+		for s.pos < s.text.len {
+			c := s.text[s.pos]
+			if !c.is_digit() {
+				if !c.is_letter() || s.is_inside_string {
+					// 5e5.str()
+					if c == `.` && s.pos + 1 < s.text.len && s.text[s.pos + 1].is_letter() {
+						call_method = true
+					}
+					break
+				} else if !has_wrong_digit {
+					has_wrong_digit = true
+					first_wrong_digit_pos = s.pos
+					first_wrong_digit = c
+				}
+			}
+			s.pos++
+		}
+	}
+	if has_wrong_digit {
+		// error check: wrong digit
+		s.pos = first_wrong_digit_pos // adjust error position
+		error('this number has unsuitable digit `$first_wrong_digit.str()`')
+	} else if s.text[s.pos - 1] in [`e`, `E`] {
+		// error check: 5e
+		s.pos-- // adjust error position
+		error('exponent has no digits')
+	} else if s.pos < s.text.len &&
+		s.text[s.pos] == `.` && !is_range && !is_float_without_fraction && !call_method {
+		// error check: 1.23.4, 123.e+3.4
+		if has_exp {
+			error('exponential part should be integer')
+		} else {
+			error('too many decimal points in number')
+		}
+	}
+	number := filter_num_sep(s.text.str, start_pos, s.pos)
+	s.pos--
+	return number
+}
+
+fn (mut s Scanner) ident_number() string {
+	if s.expect('0b', s.pos) {
+		return s.ident_bin_number()
+	} else if s.expect('0x', s.pos) {
+		return s.ident_hex_number()
+	} else if s.expect('0o', s.pos) {
+		return s.ident_oct_number()
+	} else {
+		return s.ident_dec_number()
+	}
+}
+
+//
+fn (s Scanner) expect(want string, start_pos int) bool {
+	end_pos := start_pos + want.len
+	if start_pos < 0 || start_pos >= s.text.len {
+		return false
+	}
+	if end_pos < 0 || end_pos > s.text.len {
+		return false
+	}
+	for pos in start_pos .. end_pos {
+		if s.text[pos] != want[pos - start_pos] {
+			return false
+		}
+	}
+	return true
 }
 
 [inline]

@@ -13,8 +13,9 @@ pub enum Kind {
 	bool_true				
 	bool_false
 	string				//string
-	integer		
-	float
+	number
+	// integer		
+	// float
 	datetime
 	dot 				// .
 	comma				// ,
@@ -31,9 +32,6 @@ pub enum Kind {
 	three_double_quote 	// """
 	backslash			// \
 	e 					// e or E
-	num_0x 				// 0x
-	num_0o				// 0o
-	num_0b				// 0b
 	inf         		// inf or +inf
 	_inf				// -inf
 	nan					// nan or +nan

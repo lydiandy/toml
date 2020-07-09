@@ -133,8 +133,8 @@ fn (mut d Decoder) parse_line(line string) {
 						.string { d.ident_string() }
 						.bool_true { d.ident_bool_true() }
 						.bool_false { d.ident_bool_false() }
-						.integer { d.ident_integer() }
-						.float { d.ident_float() }
+						// .integer { d.ident_integer() }
+						// .float { d.ident_float() }
 						.datetime { d.ident_datetime() }
 						.lsbr { d.ident_array() }
 						.three_single_quote { d.ident_three_single_quote() }
