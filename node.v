@@ -3,7 +3,7 @@ module toml
 import time
 
 pub enum Type {
-	root // root node
+	root // root node type
 	boolean
 	integer
 	float
@@ -11,7 +11,7 @@ pub enum Type {
 	datetime
 	array
 	object
-	array_object
+	array_of_object
 }
 
 pub type Value = bool | f64 | int | string | time.Time
@@ -22,10 +22,10 @@ pub mut:
 	typ         Type
 	name        string
 	val         Value
+	parent      &Node
 	pre         &Node
 	next        &Node
 	first_child &Node // array and object use,point to the first child Node
-	parent      &Node
 	comment     string
 }
 

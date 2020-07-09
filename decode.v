@@ -93,6 +93,9 @@ fn (mut d Decoder) merge_multi_line() {
 
 // parse each line,one line generate one Node and under root Node
 fn (mut d Decoder) parse_line() {
+	for line in d.lines {
+		
+	}
 }
 
 // scan the Node chain to target varible

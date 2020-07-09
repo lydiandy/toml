@@ -1,3 +1,37 @@
+# This is a TOML document.
+
+title = "TOML Example"
+
+[owner]
+name = "Tom Preston-Werner"
+dob = 1979-05-27T07:32:00-08:00 # First class dates
+
+[database]
+server = "192.168.1.1"
+ports = [ 8001, 8001, 8002 ]
+connection_max = 5000
+enabled = true
+
+[servers]
+
+  # Indentation (tabs and/or spaces) is allowed but not required
+  [servers.alpha]
+  ip = "10.0.0.1"
+  dc = "eqdc10"
+
+  [servers.beta]
+  ip = "10.0.0.2"
+  dc = "eqdc10"
+
+[clients]
+data = [ ["gamma", "delta"], [1, 2] ]
+
+# Line breaks are OK when inside arrays
+hosts = [
+  "alpha",
+  "omega"
+]
+
 #dev config
 env = "dev"
 port = 443
@@ -34,7 +68,48 @@ my_array=[
     'c',
 ]
 
+#array of object
+[[users]]
+name='tom'
+age=18
+height=180
 
+[[users]]
 
+[[users]]
+name='mary'
+age=33
+height=170
 
+# array of object
+[[products]]
+name = "Hammer"
+sku = 738594937
 
+[[products]]
+
+[[products]]
+name = "Nail"
+sku = 284758393
+
+color = "gray"
+
+#array of object
+[[fruit]]
+  name = "apple"
+
+  [fruit.physical]  # subtable
+    color = "red"
+    shape = "round"
+
+  [[fruit.variety]]  # nested array of tables
+    name = "red delicious"
+
+  [[fruit.variety]]
+    name = "granny smith"
+
+[[fruit]]
+  name = "banana"
+
+  [[fruit.variety]]
+    name = "plantain"
