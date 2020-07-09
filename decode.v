@@ -102,7 +102,23 @@ fn (mut d Decoder) merge_multi_line() {
 // parse each line,one line generate one Node and under root Node
 fn (mut d Decoder) parse_line() {
 	for line in d.lines {
-
+		// mut pos := 0 // current pos
+		// for pos
+		// mut c, nextc := line[pos], line[pos + 1]
+		// match c {
+		// 	'[' {
+		// 		// if nextc == '[' {
+		// 		// } else {
+		// 		// }
+		// 	}
+		// 	double_quote {}
+		// 	'=' {}
+		// 	'#' {}
+		// 	'.' {}
+		// 	else {
+		// 		println('unknown c')
+		// 	}
+		// }
 	}
 	println(d.root.name)
 }
