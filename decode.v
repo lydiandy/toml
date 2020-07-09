@@ -28,7 +28,7 @@ pub mut:
 pub fn decode_file(file string, target voidptr) ? {
 	abs_path := get_abs_path(file)
 	if !os.exists(abs_path) {
-		return error('$path is not exists')
+		return error('$file is not exists')
 	}
 	text := os.read_file(abs_path) or {
 		return error('read file $abs_path failed')
@@ -39,6 +39,7 @@ pub fn decode_file(file string, target voidptr) ? {
 // decode toml string to target varible
 pub fn decode(text string, target voidptr) ? {
 	mut d := Decoder{
+		scanner: &Scanner{}
 		text: text
 		lines: []string{}
 		nodes: []Node{}
@@ -53,8 +54,8 @@ pub fn decode(text string, target voidptr) ? {
 		next: 0
 		child: 0
 	}
-	nodes << root
-	d.current_parent = d.root
+	d.nodes << root
+	d.current_parent = &root
 	// start to decode
 	d.decode()
 	// scan to target variable
@@ -105,7 +106,7 @@ fn (mut d Decoder) merge_multi_line() {
 	d.lines = new_lines
 }
 
-fn (mut d Dccoder) parse_lines() {
+fn (mut d Decoder) parse_lines() {
 	for i := 0; i < d.lines.len; i++ {
 		line := d.lines[i]
 		d.parse_line(line)
@@ -121,13 +122,13 @@ fn (mut d Decoder) parse_line(line string) {
 	}
 	d.read_first_token()
 	for {
-		if d.token == .eol {
+		if d.token.kind == .eol {
 			break
 		}
-		match d.token {
+		match d.token.kind {
 			.name {
-				if d.next_token == .eq {
-					match d.next_token2 {
+				if d.next_token.kind == .eq {
+					match d.next_token2.kind {
 						.string { d.ident_string() }
 						.bool_true { d.ident_bool_true() }
 						.bool_false { d.ident_bool_false() }
@@ -147,7 +148,7 @@ fn (mut d Decoder) parse_line(line string) {
 			.double_lsbr {
 				d.ident_array_of_object()
 			}
-			eles {
+			else {
 				println('known node')
 			}
 		}
@@ -158,7 +159,6 @@ fn (mut d Decoder) reset_temp_varible() {
 	d.token = Token{}
 	d.next_token = Token{}
 	d.next_token2 = Token{}
-	d.in_string = false
 }
 
 // the first time,init the token,next_token,next_token2
@@ -176,36 +176,40 @@ fn (mut d Decoder) next() {
 }
 
 // identify string
-fn (mut d Decoder) indent_string() {
+fn (mut d Decoder) ident_string() {
 }
 
 // identify bool true
 fn (mut d Decoder) ident_bool_true() {
 	node := Node{
-		typ: .bool_true
-		name: d.token.val
+		typ: .boolean
+		name: 'bool_true'
 		val: true
 		parent: d.current_parent
 		pre: d.current_pre
+		next:0
+		child:0
 	}
 	d.nodes << node
-	d.current_pre.next = node
-	d.current_pre = node
+	d.current_pre.next = &node
+	d.current_pre = &node
 	d.next()
 }
 
 // identify bool false
 fn (mut d Decoder) ident_bool_false() {
 	node := Node{
-		typ: .bool_false
-		name: d.token.val
+		typ: .boolean
+		name: 'bool_false'
 		val: false
-		parent: d.current_parent
+		parent: &d.current_parent
 		pre: d.current_pre
+		next:0
+		child:0
 	}
 	d.nodes << node
-	d.current_pre.next = node
-	d.current_pre = node
+	d.current_pre.next = &node
+	d.current_pre = &node
 	d.next()
 }
 
@@ -214,7 +218,7 @@ fn (mut d Decoder) ident_integer() {
 }
 
 // identify float
-fn (mut d Decoder) indent_float() {
+fn (mut d Decoder) ident_float() {
 }
 
 // identify datetime

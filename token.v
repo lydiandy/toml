@@ -3,6 +3,7 @@ module toml
 pub struct Token {
 	kind    Kind
 	val     string  //only string,integer,float,datetime have val
+	len 	int
 }
 
 pub enum Kind {
@@ -20,7 +21,7 @@ pub enum Kind {
 	lsbr 				// [
 	rsbr 				// ]
 	double_lsbr 		// [[
-	double_rsbl 		// ]]
+	double_rsbr 		// ]]
 	lcbr				// {
 	rcbr 				// }
 	plus   				// +
@@ -34,7 +35,7 @@ pub enum Kind {
 	num_0o				// 0o
 	num_0b				// 0b
 	inf         		// inf or +inf
-	-inf				// -inf
+	_inf				// -inf
 	nan					// nan or +nan
-	-nan				// -nan
+	_nan				// -nan
 }

@@ -28,59 +28,42 @@ pub fn (mut s Scanner) scan() Token {
 	c := s.text[s.pos]
 	nextc := s.look_ahead(1)
 	match c {
-		'=' {
-			return new_token(.eq, '', 1)
+		`=` {
+			return s.new_token(.eq, '', 1)
 		}
-		'[' {
-			if nextc == '[' {
-				return new_token(.double_lsbr, '', 2)
+		`[` {
+			if nextc == `[` {
+				return s.new_token(.double_lsbr, '', 2)
 			} else {
-				return new_token(.lsbr, '', 1)
+				return s.new_token(.lsbr, '', 1)
 			}
 		}
-		']' {
-			if nextc == ']' {
-				return new_token(.double_rsbr, '', 2)
+		`]` {
+			if nextc == `]` {
+				return s.new_token(.double_rsbr, '', 2)
 			} else {
-				return new_token(.rsbr, '', 1)
+				return s.new_token(.rsbr, '', 1)
 			}
 		}
-		',' {
-			return new_token(.comma, '', 1)
+		`,` {
+			return s.new_token(.comma, '', 1)
 		}
 		else {
 			println('known token')
 		}
 	}
-	// mut pos := 0 // current pos
-	// for pos
-	// mut c, nextc := line[pos], line[pos + 1]
-	// match c {
-	// '[' {
-	// // if nextc == '[' {
-	// // } else {
-	// // }
-	// }
-	// double_quote {}
-	// '=' {}
-	// '#' {}
-	// '.' {}
-	// else {
-	// println('unknown c')
-	// }
-	// }
 }
 
 // skip white space
 fn (mut s Scanner) skip_whitespace() {
-	for s.pos < s.text.len && s.text[pos].is_space() {
+	for s.pos < s.text.len && s.text[s.pos].is_space() {
 		s.pos++
 	}
 }
 
 // skip at the end of the line comment
 fn (mut s Scanner) skip_line_comment() {
-	if s.text[pos] == '#' {
+	if s.text[s.pos] == `#` {
 		for s.pos < s.text.len {
 			s.pos++
 		}
@@ -102,7 +85,7 @@ fn (mut s Scanner) end_of_line() Token {
 	return s.new_token(.eol, '', 0)
 }
 
-pub fn (s Scanner) new_token(tok_kind Kind, val string, len int) Token {
+pub fn (mut s Scanner) new_token(tok_kind Kind, val string, len int) Token {
 	if len > 0 {
 		s.pos = s.pos + len - 1
 	}
