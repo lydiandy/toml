@@ -4,14 +4,13 @@ import os
 
 pub struct Decoder {
 pub:
-	text          string // toml text
+	text           string // toml text
 pub mut:
-	lines         []string // split toml text to lines
-	root          Node // the root of Node
+	lines          []string // split toml text to lines
+	root           &Node // the root of Node
 	// temp field
-	parent        &Node
-	pre           &Node
-	current_group string
+	current_parent &Node
+	pre            &Node
 }
 
 // decode toml file to target varible
@@ -31,17 +30,18 @@ pub fn decode(text string, target voidptr) ? {
 	mut d := Decoder{
 		text: text
 		lines: []string{}
-		root: Node{
-			typ: Type.root
+		root: &Node{
+			typ: Type.object
 			name: 'root'
 			parent: 0
 			pre: 0
 			next: 0
-			first_child: 0
+			child: 0
 		}
-		parent: 0
+		current_parent:0
 		pre: 0
 	}
+	d.current_parent=d.root
 	d.decode()
 	d.scan_to(target)
 }
@@ -94,7 +94,6 @@ fn (mut d Decoder) merge_multi_line() {
 // parse each line,one line generate one Node and under root Node
 fn (mut d Decoder) parse_line() {
 	for line in d.lines {
-		
 	}
 }
 
