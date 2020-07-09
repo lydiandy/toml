@@ -2,6 +2,12 @@ module toml
 
 import os
 
+const (
+	single_quote = `\'`
+	double_quote = `"`
+	num_sep      = `_`
+)
+
 pub struct Decoder {
 pub:
 	text           string // toml text
@@ -10,7 +16,8 @@ pub mut:
 	root           &Node // the root of Node
 	// temp field
 	current_parent &Node
-	pre            &Node
+	current_pre    &Node
+	in_string      bool
 }
 
 // decode toml file to target varible
@@ -38,10 +45,11 @@ pub fn decode(text string, target voidptr) ? {
 			next: 0
 			child: 0
 		}
-		current_parent:0
-		pre: 0
+		current_parent: 0
+		current_pre: 0
+		in_string: false
 	}
-	d.current_parent=d.root
+	d.current_parent = d.root
 	d.decode()
 	d.scan_to(target)
 }
@@ -94,7 +102,12 @@ fn (mut d Decoder) merge_multi_line() {
 // parse each line,one line generate one Node and under root Node
 fn (mut d Decoder) parse_line() {
 	for line in d.lines {
+
 	}
+	println(d.root.name)
+}
+
+fn end_of_line() {
 }
 
 // scan the Node chain to target varible

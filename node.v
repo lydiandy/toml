@@ -10,6 +10,7 @@ pub enum Type {
 	datetime
 	array
 	object
+	array_of_object
 }
 
 pub type Value = bool | f64 | int | string | time.Time
@@ -26,18 +27,15 @@ pub mut:
 	child  &Node // just array and object use,point to the first child Node
 }
 
-pub fn new_node(name string, typ Type, val Value) &Node {
-	mut n := Node{
+pub fn new_node(name string, typ Type, val Value, parent, pre, next, child &Node) &Node {
+	n := &Node{
 		name: name
 		typ: typ
 		val: val
-		parent: 0
-		pre: 0
-		next: 0
-		child: 0
+		parent: parent
+		pre: pre
+		next: next
+		child: child
 	}
-	return &n
-}
-
-pub fn remove_node() {
+	return n
 }
