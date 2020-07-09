@@ -2,12 +2,6 @@ module toml
 
 import os
 
-const (
-	single_quote = `\'`
-	double_quote = `"`
-	num_sep      = `_`
-)
-
 pub struct Decoder {
 pub:
 	text           string // toml text

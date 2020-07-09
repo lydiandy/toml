@@ -1,5 +1,11 @@
 module toml
 
+const (
+	single_quote = `\'`
+	double_quote = `"`
+	num_sep      = `_`
+)
+
 // for scan each line and generate tokens
 pub struct Scanner {
 pub mut:
