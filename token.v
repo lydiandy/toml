@@ -14,8 +14,6 @@ pub enum Kind {
 	bool_false
 	string				//string
 	number
-	// integer		
-	// float
 	datetime
 	dot 				// .
 	comma				// ,
@@ -27,9 +25,6 @@ pub enum Kind {
 	rcbr 				// }
 	plus   				// +
 	minus				// -
-	// underline			// _
-	// three_single_quote 	// '''
-	// three_double_quote 	// """
 	backslash			// \
 	inf         		// inf or +inf
 	_inf				// -inf
