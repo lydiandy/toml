@@ -145,12 +145,24 @@ fn (mut d Decoder) parse_line(line string) {
 			.name {
 				if d.next_token.kind == .eq {
 					match d.next_token2.kind {
-						.string { d.string_node() }
-						.bool_true { d.bool_node(true) }
-						.bool_false { d.bool_node(false) }
-						.datetime { d.datetime_node() }
-						.lsbr { d.array_node() }
-						else { println('known node') }
+						.string {
+							d.string_node()
+						}
+						.bool_true {
+							d.bool_node(true)
+						}
+						.bool_false {
+							d.bool_node(false)
+						}
+						.datetime {
+							d.datetime_node()
+						}
+						.lsbr {
+							d.array_node()
+						}
+						else {
+							d.next()
+						}
 					}
 				}
 			}
@@ -160,8 +172,11 @@ fn (mut d Decoder) parse_line(line string) {
 			.double_lsbr {
 				d.array_of_object_node()
 			}
+			.unknown {
+				println('unknown node')
+			}
 			else {
-				println('known node')
+				d.next()
 			}
 		}
 	}
@@ -183,7 +198,7 @@ fn (mut d Decoder) read_first_token() {
 // next token
 fn (mut d Decoder) next() {
 	d.token = d.next_token
-	d.next_token = d.next_token
+	d.next_token = d.next_token2
 	d.next_token2 = d.scanner.scan()
 }
 
@@ -206,30 +221,37 @@ fn (mut d Decoder) bool_node(b bool) {
 
 // identify number node
 fn (mut d Decoder) number_node() {
+	d.next()
 }
 
 // identify string node
 fn (mut d Decoder) string_node() {
+	d.next()
 }
 
 // identify datetime node
 fn (mut d Decoder) datetime_node() {
+	d.next()
 }
 
 // identify array node
 fn (mut d Decoder) array_node() {
+	d.next()
 }
 
 // identify object node
 fn (mut d Decoder) object_node() {
+	d.next()
 }
 
 // identify array_of_object node
 fn (mut d Decoder) array_of_object_node() {
+	d.next()
 }
 
 // scan the Node chain to target varible
 fn (mut d Decoder) scan_to(target voidptr) {
+	d.next()
 }
 
 //

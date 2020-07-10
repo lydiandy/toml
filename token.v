@@ -7,6 +7,7 @@ pub struct Token {
 }
 
 pub enum Kind {
+	unknown				//unknown token
 	eol 				//end of line
 	name 				//ident
 	eq					//=

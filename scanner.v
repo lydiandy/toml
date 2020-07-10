@@ -1,20 +1,20 @@
 module toml
 
 const (
-	single_quote = `\'`
-	double_quote = `"`
-	three_single_quote ='\'\'\''
-	three_double_quote ='"""'
-	num_sep      = `_`
+	single_quote       = `\'`
+	double_quote       = `"`
+	three_single_quote = "\'\'\'"
+	three_double_quote = '"""'
+	num_sep            = `_`
 )
 
 // for scan each line and generate tokens
 pub struct Scanner {
 pub mut:
-	text       string
-	pos        int
+	text             string
+	pos              int
 	is_inside_string bool
-	is_started bool
+	is_started       bool
 }
 
 // scan once generate one token
@@ -47,29 +47,26 @@ pub fn (mut s Scanner) scan() Token {
 	}
 	// ident string
 	if c == single_quote {
-		//there single quote
-		if nextc==single_quote && nextc2==single_quote {
+		// there single quote
+		if nextc == single_quote && nextc2 == single_quote {
 			ident_string := s.ident_string(three_single_quote)
 			return s.new_token(.string, ident_string, ident_string.len + 6)
 		} else {
-		//single quote
-		ident_string := s.ident_string(single_quote.str())
-		return s.new_token(.string, ident_string, ident_string.len + 2)
+			// single quote
+			ident_string := s.ident_string(single_quote.str())
+			return s.new_token(.string, ident_string, ident_string.len + 2)
 		}
-
 	}
 	if c == double_quote {
-		//three double quote
-		if nextc==double_quote && nextc2==double_quote {
+		// three double quote
+		if nextc == double_quote && nextc2 == double_quote {
 			ident_string := s.ident_string(three_double_quote)
 			return s.new_token(.string, ident_string, ident_string.len + 6)
 		} else {
-		//double quote
+			// double quote
 			ident_string := s.ident_string(double_quote.str())
 			return s.new_token(.string, ident_string, ident_string.len + 2)
 		}
-
-
 	}
 	// ident number
 	if c.is_digit() || (c == `.` && nextc.is_digit()) {
@@ -102,10 +99,9 @@ pub fn (mut s Scanner) scan() Token {
 			return s.new_token(.dot, '', 1)
 		}
 		else {
-			println('unknown token')
+			return s.new_token(.unknown, 'unknown token', 1)
 		}
 	}
-	return s.new_token(.eol,'',1)
 }
 
 // skip white space
@@ -139,18 +135,13 @@ fn (mut s Scanner) ident_name() string {
 
 // ident string
 fn (mut s Scanner) ident_string(quote string) string {
-	s.pos+=quote.len
+	s.pos += quote.len
 	start := s.pos
-	for s.pos < s.text.len && s.text[s.pos..(s.pos+quote.len)] != quote {
+	for s.pos < s.text.len && s.text[s.pos..(s.pos + quote.len)] != quote {
 		s.pos++
 	}
 	ident_string := s.text[start..s.pos]
-	if quote.len==1 {
-		s.pos--
-	} else {
-		s.pos+=2
-	}
-	
+	s.pos += (quote.len - 1)
 	return ident_string
 }
 
