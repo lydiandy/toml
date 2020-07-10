@@ -119,10 +119,6 @@ fn (mut d Decoder) merge_multi_line() {
 		}
 	}
 	d.lines = new_lines
-	for l in d.lines {
-		println(l)
-		println('')
-	}
 }
 
 fn (mut d Decoder) parse_lines() {
@@ -149,22 +145,20 @@ fn (mut d Decoder) parse_line(line string) {
 			.name {
 				if d.next_token.kind == .eq {
 					match d.next_token2.kind {
-						.string { d.ident_string() }
-						.bool_true { d.ident_bool_true() }
-						.bool_false { d.ident_bool_false() }
-						// .integer { d.ident_integer() }
-						// .float { d.ident_float() }
-						.datetime { d.ident_datetime() }
-						.lsbr { d.ident_array() }
+						.string { d.string_node() }
+						.bool_true { d.bool_node(true) }
+						.bool_false { d.bool_node(false) }
+						.datetime { d.datetime_node() }
+						.lsbr { d.array_node() }
 						else { println('known node') }
 					}
 				}
 			}
 			.lsbr {
-				d.ident_group()
+				d.object_node()
 			}
 			.double_lsbr {
-				d.ident_array_of_object()
+				d.array_of_object_node()
 			}
 			else {
 				println('known node')
@@ -193,17 +187,12 @@ fn (mut d Decoder) next() {
 	d.next_token2 = d.scanner.scan()
 }
 
-// identify string
-fn (mut d Decoder) ident_string() {
-	d.next()
-}
-
-// identify bool true
-fn (mut d Decoder) ident_bool_true() {
+// identify bool node
+fn (mut d Decoder) bool_node(b bool) {
 	node := Node{
 		typ: .boolean
-		name: 'bool_true'
-		val: true
+		name: 'bool_$b'
+		val: b
 		parent: d.current_parent
 		pre: d.current_pre
 		next: 0
@@ -215,65 +204,28 @@ fn (mut d Decoder) ident_bool_true() {
 	d.next()
 }
 
-// identify bool false
-fn (mut d Decoder) ident_bool_false() {
-	node := Node{
-		typ: .boolean
-		name: 'bool_false'
-		val: false
-		parent: &d.current_parent
-		pre: d.current_pre
-		next: 0
-		child: 0
-	}
-	d.nodes << node
-	d.current_pre.next = &node
-	d.current_pre = &node
-	d.next()
+// identify number node
+fn (mut d Decoder) number_node() {
 }
 
-// identify integer
-fn (mut d Decoder) ident_integer() {
-	d.next()
+// identify string node
+fn (mut d Decoder) string_node() {
 }
 
-// identify float
-fn (mut d Decoder) ident_float() {
-	d.next()
+// identify datetime node
+fn (mut d Decoder) datetime_node() {
 }
 
-// identify datetime
-fn (mut d Decoder) ident_datetime() {
-	d.next()
+// identify array node
+fn (mut d Decoder) array_node() {
 }
 
-// identify array
-fn (mut d Decoder) ident_array() {
-	d.next()
+// identify object node
+fn (mut d Decoder) object_node() {
 }
 
-// identify three_single_quote
-fn (mut d Decoder) ident_three_single_quote() {
-	d.next()
-}
-
-// identify three_double_quote
-fn (mut d Decoder) ident_three_double_quote() {
-	d.next()
-}
-
-// identify group
-fn (mut d Decoder) ident_group() {
-	d.next()
-}
-
-// identify array_of_object
-fn (mut d Decoder) ident_array_of_object() {
-	d.next()
-}
-
-// reach end of line
-fn (mut d Decoder) end_of_line() {
+// identify array_of_object node
+fn (mut d Decoder) array_of_object_node() {
 }
 
 // scan the Node chain to target varible

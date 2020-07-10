@@ -78,7 +78,6 @@ pub fn (mut s Scanner) scan() Token {
 	}
 	// other char
 	match c {
-		// single_quote {
 		`=` {
 			return s.new_token(.eq, '', 1)
 		}
@@ -142,11 +141,16 @@ fn (mut s Scanner) ident_name() string {
 fn (mut s Scanner) ident_string(quote string) string {
 	s.pos+=quote.len
 	start := s.pos
-	for s.pos < s.text.len && s.text[s.pos..s.pos+quote.len] != quote {
+	for s.pos < s.text.len && s.text[s.pos..(s.pos+quote.len)] != quote {
 		s.pos++
 	}
 	ident_string := s.text[start..s.pos]
-	s.pos--
+	if quote.len==1 {
+		s.pos--
+	} else {
+		s.pos+=2
+	}
+	
 	return ident_string
 }
 

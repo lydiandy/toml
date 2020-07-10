@@ -4,8 +4,9 @@ import time
 
 pub enum Type {
 	boolean
-	integer
-	float
+	nummber
+	// integer
+	// float
 	string_
 	datetime
 	array
