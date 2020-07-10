@@ -98,6 +98,20 @@ pub fn (mut s Scanner) scan() Token {
 		`.` {
 			return s.new_token(.dot, '', 1)
 		}
+		`{` {
+			return s.new_token(.lcbr,'',1)
+		}
+		`}` {
+			return s.new_token(.rcbr,'',1)
+		}
+		`+` {
+			return s.new_token(.plus,'',1)
+		}
+		`-` {
+			return s.new_token(.minus,'',1)
+		}
+		
+
 		else {
 			return s.new_token(.unknown, 'unknown token', 1)
 		}

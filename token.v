@@ -26,9 +26,9 @@ pub enum Kind {
 	rcbr 				// }
 	plus   				// +
 	minus				// -
-	backslash			// \
-	inf         		// inf or +inf
-	_inf				// -inf
-	nan					// nan or +nan
-	_nan				// -nan
+	// backslash			// \
+	// inf         		// inf or +inf
+	// _inf				// -inf
+	// nan					// nan or +nan
+	// _nan				// -nan
 }
