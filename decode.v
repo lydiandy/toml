@@ -84,12 +84,31 @@ fn (mut d Decoder) merge_multi_line() {
 	mut new_lines := []string{}
 	for i := 0; i < d.lines.len; i++ {
 		line := d.lines[i]
-		if line.ends_with('[') || line.ends_with("\'\'\'") || line.ends_with('"""') {
+		if line.ends_with('[') {
 			mut merge_line := ''
 			for j := i; j < d.lines.len; j++ {
 				merge_line += d.lines[j]
-				if d.lines[j].starts_with(']') || d.lines[j].starts_with("\'\'\'") ||
-					d.lines[j].starts_with('"""') {
+				if d.lines[j].starts_with(']') {
+					i = j
+					break
+				}
+			}
+			new_lines << merge_line
+		} else if line.ends_with("\'\'\'") {
+			mut merge_line := ''
+			for j := i; j < d.lines.len; j++ {
+				merge_line += d.lines[j]
+				if d.lines[j].starts_with("\'\'\'") {
+					i = j
+					break
+				}
+			}
+			new_lines << merge_line
+		} else if line.ends_with('"""') {
+			mut merge_line := ''
+			for j := i; j < d.lines.len; j++ {
+				merge_line += d.lines[j]
+				if d.lines[j].starts_with('"""') {
 					i = j
 					break
 				}
@@ -104,7 +123,6 @@ fn (mut d Decoder) merge_multi_line() {
 		println(l)
 		println('')
 	}
-	println('')
 }
 
 fn (mut d Decoder) parse_lines() {

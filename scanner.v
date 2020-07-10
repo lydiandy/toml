@@ -52,6 +52,7 @@ pub fn (mut s Scanner) scan() Token {
 			ident_string := s.ident_string(three_single_quote)
 			return s.new_token(.string, ident_string, ident_string.len + 6)
 		} else {
+		//single quote
 		ident_string := s.ident_string(single_quote.str())
 		return s.new_token(.string, ident_string, ident_string.len + 2)
 		}
@@ -63,6 +64,7 @@ pub fn (mut s Scanner) scan() Token {
 			ident_string := s.ident_string(three_double_quote)
 			return s.new_token(.string, ident_string, ident_string.len + 6)
 		} else {
+		//double quote
 			ident_string := s.ident_string(double_quote.str())
 			return s.new_token(.string, ident_string, ident_string.len + 2)
 		}
