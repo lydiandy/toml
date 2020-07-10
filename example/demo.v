@@ -31,7 +31,8 @@ struct Jwt {
 }
 
 fn main() {
-	file := 'toml_example.toml'
+	file := 'simple.toml'
+	// file := 'toml_example.toml'
 	// file := 'dev_config.toml'
 	mut config := Config{}
 	toml.decode_file(file, &config) or {

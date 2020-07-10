@@ -3,6 +3,8 @@ module toml
 const (
 	single_quote = `\'`
 	double_quote = `"`
+	three_single_quote ='\'\'\''
+	three_double_quote ='"""'
 	num_sep      = `_`
 )
 
@@ -45,12 +47,27 @@ pub fn (mut s Scanner) scan() Token {
 	}
 	// ident string
 	if c == single_quote {
-		ident_string := s.ident_string(single_quote)
+		//there single quote
+		if nextc==single_quote && nextc2==single_quote {
+			ident_string := s.ident_string(three_single_quote)
+			return s.new_token(.string, ident_string, ident_string.len + 6)
+		} else {
+		ident_string := s.ident_string(single_quote.str())
 		return s.new_token(.string, ident_string, ident_string.len + 2)
+		}
+
 	}
 	if c == double_quote {
-		ident_string := s.ident_string(double_quote)
-		return s.new_token(.string, ident_string, ident_string.len + 2)
+		//three double quote
+		if nextc==double_quote && nextc2==double_quote {
+			ident_string := s.ident_string(three_double_quote)
+			return s.new_token(.string, ident_string, ident_string.len + 6)
+		} else {
+			ident_string := s.ident_string(double_quote.str())
+			return s.new_token(.string, ident_string, ident_string.len + 2)
+		}
+
+
 	}
 	// ident number
 	if c.is_digit() || (c == `.` && nextc.is_digit()) {
@@ -87,6 +104,7 @@ pub fn (mut s Scanner) scan() Token {
 			println('unknown token')
 		}
 	}
+	return s.new_token(.eol,'',1)
 }
 
 // skip white space
@@ -119,10 +137,10 @@ fn (mut s Scanner) ident_name() string {
 }
 
 // ident string
-fn (mut s Scanner) ident_string(quote byte) string {
-	s.pos++
+fn (mut s Scanner) ident_string(quote string) string {
+	s.pos+=quote.len
 	start := s.pos
-	for s.pos < s.text.len && s.text[s.pos] != quote {
+	for s.pos < s.text.len && s.text[s.pos..s.pos+quote.len] != quote {
 		s.pos++
 	}
 	ident_string := s.text[start..s.pos]

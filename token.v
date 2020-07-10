@@ -27,11 +27,10 @@ pub enum Kind {
 	rcbr 				// }
 	plus   				// +
 	minus				// -
-	underline			// _
-	three_single_quote 	// '''
-	three_double_quote 	// """
+	// underline			// _
+	// three_single_quote 	// '''
+	// three_double_quote 	// """
 	backslash			// \
-	e 					// e or E
 	inf         		// inf or +inf
 	_inf				// -inf
 	nan					// nan or +nan

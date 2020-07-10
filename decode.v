@@ -78,26 +78,33 @@ fn (mut d Decoder) remove_empty_and_comment_line() {
 	d.lines = new_lines
 }
 
-// because of some statement can write mulit line,for example array,
+// because of some statement can write mulit line,for example array,multi line string
 // make multi line to one line,make sure one line generate one Node
 fn (mut d Decoder) merge_multi_line() {
 	mut new_lines := []string{}
 	for i := 0; i < d.lines.len; i++ {
-		if d.lines[i].ends_with('[') {
+		line := d.lines[i]
+		if line.ends_with('[') || line.ends_with("\'\'\'") || line.ends_with('"""') {
 			mut merge_line := ''
 			for j := i; j < d.lines.len; j++ {
 				merge_line += d.lines[j]
-				if d.lines[j].starts_with(']') {
+				if d.lines[j].starts_with(']') || d.lines[j].starts_with("\'\'\'") ||
+					d.lines[j].starts_with('"""') {
 					i = j
 					break
 				}
 			}
 			new_lines << merge_line
 		} else {
-			new_lines << d.lines[i]
+			new_lines << line
 		}
 	}
 	d.lines = new_lines
+	for l in d.lines {
+		println(l)
+		println('')
+	}
+	println('')
 }
 
 fn (mut d Decoder) parse_lines() {
@@ -117,7 +124,7 @@ fn (mut d Decoder) parse_line(line string) {
 	d.read_first_token()
 	for {
 		if d.token.kind == .eol {
-			println('end of line')
+			println('-----------')
 			break
 		}
 		match d.token.kind {
@@ -131,8 +138,6 @@ fn (mut d Decoder) parse_line(line string) {
 						// .float { d.ident_float() }
 						.datetime { d.ident_datetime() }
 						.lsbr { d.ident_array() }
-						.three_single_quote { d.ident_three_single_quote() }
-						.three_double_quote { d.ident_three_double_quote() }
 						else { println('known node') }
 					}
 				}
@@ -172,6 +177,7 @@ fn (mut d Decoder) next() {
 
 // identify string
 fn (mut d Decoder) ident_string() {
+	d.next()
 }
 
 // identify bool true
@@ -210,34 +216,42 @@ fn (mut d Decoder) ident_bool_false() {
 
 // identify integer
 fn (mut d Decoder) ident_integer() {
+	d.next()
 }
 
 // identify float
 fn (mut d Decoder) ident_float() {
+	d.next()
 }
 
 // identify datetime
 fn (mut d Decoder) ident_datetime() {
+	d.next()
 }
 
 // identify array
 fn (mut d Decoder) ident_array() {
+	d.next()
 }
 
 // identify three_single_quote
 fn (mut d Decoder) ident_three_single_quote() {
+	d.next()
 }
 
 // identify three_double_quote
 fn (mut d Decoder) ident_three_double_quote() {
+	d.next()
 }
 
 // identify group
 fn (mut d Decoder) ident_group() {
+	d.next()
 }
 
 // identify array_of_object
 fn (mut d Decoder) ident_array_of_object() {
+	d.next()
 }
 
 // reach end of line
