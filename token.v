@@ -15,7 +15,7 @@ pub enum Kind {
 	bool_false
 	string				//string
 	number
-	datetime
+	datetime			//TODO
 	dot 				// .
 	comma				// ,
 	lsbr 				// [

@@ -17,6 +17,15 @@ pub mut:
 	is_started       bool
 }
 
+pub fn (mut s Scanner) new_token(tok_kind Kind, val Value, len int) Token {
+	println('$tok_kind:$val')
+	return Token{
+		kind: tok_kind
+		val: val
+		len: len
+	}
+}
+
 // scan once generate one token
 pub fn (mut s Scanner) scan() Token {
 	if s.is_started {
@@ -96,22 +105,20 @@ pub fn (mut s Scanner) scan() Token {
 			return s.new_token(.comma, '', 1)
 		}
 		`.` {
-			return s.new_token(.dot, '', 1)
+			return s.new_token(.dot, '.', 1)
 		}
 		`{` {
-			return s.new_token(.lcbr,'',1)
+			return s.new_token(.lcbr, '', 1)
 		}
 		`}` {
-			return s.new_token(.rcbr,'',1)
+			return s.new_token(.rcbr, '', 1)
 		}
 		`+` {
-			return s.new_token(.plus,'',1)
+			return s.new_token(.plus, '', 1)
 		}
 		`-` {
-			return s.new_token(.minus,'',1)
+			return s.new_token(.minus, '', 1)
 		}
-		
-
 		else {
 			return s.new_token(.unknown, 'unknown token', 1)
 		}
@@ -128,7 +135,6 @@ fn (mut s Scanner) skip_whitespace() {
 // skip at the end of the line comment
 fn (mut s Scanner) skip_line_comment() {
 	if s.text[s.pos] == `#` {
-		println('comment is: ${s.text[s.pos..s.text.len]}')
 		for s.pos < s.text.len {
 			s.pos++
 		}
@@ -420,13 +426,4 @@ fn (s Scanner) look_ahead(n int) byte {
 fn (mut s Scanner) end_of_line() Token {
 	s.pos = s.text.len
 	return s.new_token(.eol, '', 0)
-}
-
-pub fn (mut s Scanner) new_token(tok_kind Kind, val Value, len int) Token {
-	println('$tok_kind:$val')
-	return Token{
-		kind: tok_kind
-		val: val
-		len: len
-	}
 }

@@ -1,24 +1,23 @@
 
-#dev config
-env = "dev"
-port = 443
+env = "dev" #xxxxxx
+port = 443 
 
 #databse config
 [db]
 client = "postgres"
-host = "127.0.0.1"
-port = 8888
 database = "test_db"
-user = "postgres"
+host = "127.0.0.1"
 password = "abcd"
+port = 8888
+user = "postgres"
 
 #redis config
 [redis]
 host = "127.0.0.1"
-port = 5432
 password = ""
+port = 5432
 
 #jwt config
 [jwt]
+jwt_cookie = ""
 jwt_key = "key"
-jwt_cookie =""

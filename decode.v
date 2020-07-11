@@ -16,6 +16,7 @@ pub mut:
 	//
 	current_parent &Node
 	current_pre    &Node
+	is_new_group   bool
 }
 
 // decode toml file to target varible
@@ -84,6 +85,7 @@ fn (mut d Decoder) merge_multi_line() {
 	mut new_lines := []string{}
 	for i := 0; i < d.lines.len; i++ {
 		line := d.lines[i]
+		// multi line array [ is the last char
 		if line.ends_with('[') {
 			mut merge_line := ''
 			for j := i; j < d.lines.len; j++ {
@@ -94,6 +96,7 @@ fn (mut d Decoder) merge_multi_line() {
 				}
 			}
 			new_lines << merge_line
+			// multi line string ''' is the last char
 		} else if line.ends_with("\'\'\'") {
 			mut merge_line := ''
 			for j := i; j < d.lines.len; j++ {
@@ -104,6 +107,7 @@ fn (mut d Decoder) merge_multi_line() {
 				}
 			}
 			new_lines << merge_line
+			// multi line string """ is the last char
 		} else if line.ends_with('"""') {
 			mut merge_line := ''
 			for j := i; j < d.lines.len; j++ {
@@ -145,24 +149,12 @@ fn (mut d Decoder) parse_line(line string) {
 			.name {
 				if d.next_token.kind == .eq {
 					match d.next_token2.kind {
-						.string {
-							d.string_node()
-						}
-						.bool_true {
-							d.bool_node(true)
-						}
-						.bool_false {
-							d.bool_node(false)
-						}
-						.datetime {
-							d.datetime_node()
-						}
-						.lsbr {
-							d.array_node()
-						}
-						else {
-							d.next()
-						}
+						.string { d.string_node() }
+						.bool_true { d.bool_node(true) }
+						.bool_false { d.bool_node(false) }
+						.datetime { d.datetime_node() }
+						.lsbr { d.array_node() }
+						else { d.next() }
 					}
 				}
 			}
@@ -174,9 +166,10 @@ fn (mut d Decoder) parse_line(line string) {
 			}
 			.unknown {
 				println('unknown node')
+				d.next()
 			}
 			else {
-				d.next()
+				// d.next()
 			}
 		}
 	}
@@ -241,6 +234,27 @@ fn (mut d Decoder) array_node() {
 
 // identify object node
 fn (mut d Decoder) object_node() {
+	mut name := ''
+	d.next()
+	for d.token.kind != .rsbr {
+		mut after_name:=d.token.val as string
+		println(after_name)
+		// name=name+after_name
+		d.next()
+	}
+	println(name)
+	node := Node{
+		typ: .object
+		name: name
+		val: ''
+		parent: d.current_parent
+		pre: d.current_pre
+		next: 0
+		child: 0
+	}
+	d.nodes << node
+	d.current_parent = &node
+	d.current_pre = &node
 	d.next()
 }
 
