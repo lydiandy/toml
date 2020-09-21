@@ -4,7 +4,7 @@ import time
 
 pub enum Type {
 	boolean
-	nummber
+	nummber	
 	// integer
 	// float
 	string_

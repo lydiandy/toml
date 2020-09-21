@@ -237,7 +237,7 @@ fn (mut d Decoder) object_node() {
 	mut name := ''
 	d.next()
 	for d.token.kind != .rsbr {
-		mut after_name:=d.token.val as string
+		mut after_name := d.token.val as string
 		println(after_name)
 		// name=name+after_name
 		d.next()
