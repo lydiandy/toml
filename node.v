@@ -4,8 +4,7 @@ import time
 
 pub enum Type {
 	boolean
-	nummber	
-	// integer
+	number	// integer
 	// float
 	string_
 	datetime
@@ -25,16 +24,10 @@ pub fn (v Value) str() string {
 				return 'false'
 			}
 		}
-		f64 {
-			return v.str()
-		}
-		int {
-			return v.str()
-		}
 		string {
 			return v
 		}
-		time.Time {
+		f64, int, time.Time {
 			return v.str()
 		}
 	}
@@ -52,7 +45,7 @@ pub mut:
 	child  &Node // just array and object use,point to the first child Node
 }
 
-pub fn new_node(name string, typ Type, val Value, parent, pre, next, child &Node) &Node {
+pub fn new_node(name string, typ Type, val Value, parent &Node, pre &Node, next &Node, child &Node) &Node {
 	n := &Node{
 		name: name
 		typ: typ
