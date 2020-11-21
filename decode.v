@@ -37,20 +37,8 @@ pub fn decode(text string, target voidptr) ? {
 		scanner: &Scanner{}
 		text: text
 		lines: []string{}
-		nodes: []Node{}
-		current_parent: 0
-		current_pre: 0
 	}
-	root := Node{
-		typ: Type.object
-		name: 'root'
-		parent: 0
-		pre: 0
-		next: 0
-		child: 0
-	}
-	d.nodes << root
-	d.current_parent = &root
+	
 	// start to decode
 	d.decode()
 	// scan to target variable
@@ -242,19 +230,6 @@ fn (mut d Decoder) object_node() {
 		// name=name+after_name
 		d.next()
 	}
-	println(name)
-	node := Node{
-		typ: .object
-		name: name
-		val: ''
-		parent: d.current_parent
-		pre: d.current_pre
-		next: 0
-		child: 0
-	}
-	d.nodes << node
-	d.current_parent = &node
-	d.current_pre = &node
 	d.next()
 }
 
