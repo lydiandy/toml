@@ -1,9 +1,11 @@
-module toml
+module token
 
 pub struct Token {
-	kind Kind
-	val  string // only name,string,integer,float,datetime
-	len  int
+	kind    Kind
+	val     string // only name,string,integer,float,datetime
+	line_nr int // the line number in the source where the token occured
+	pos     int // the position of the token in scanner text
+	len     int // the length of val
 }
 
 pub enum Kind {

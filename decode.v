@@ -6,43 +6,17 @@ pub struct Decoder {
 pub:
 	text           string // toml text
 pub mut:
-	lines          []string // split toml text to lines
-	nodes          []Node // all nodes are stored here,the first one is root node
+	root           map[string]Any // the root of node
 	scanner        &Scanner // when scanner new line the scanner will be new one
+	lines          []string // split toml text to lines
 	// temp field
 	token          Token
 	next_token     Token
 	next_token2    Token
 	//
-	current_parent &Node
-	current_pre    &Node
+	current_parent &Any
+	current_pre    &Any
 	is_new_group   bool
-}
-
-// decode toml file to target varible
-pub fn decode_file(file string, target voidptr) ? {
-	abs_path := get_abs_path(file)
-	if !os.exists(abs_path) {
-		return error('$file is not exists')
-	}
-	text := os.read_file(abs_path) or {
-		return error('read file $abs_path failed')
-	}
-	return decode(text, target)
-}
-
-// decode toml string to target varible
-pub fn decode(text string, target voidptr) ? {
-	mut d := Decoder{
-		scanner: &Scanner{}
-		text: text
-		lines: []string{}
-	}
-	
-	// start to decode
-	d.decode()
-	// scan to target variable
-	d.scan_to(target)
 }
 
 // decode the text to Node chain

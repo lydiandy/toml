@@ -1,8 +1,9 @@
 module toml
 
 pub struct Encoder {
+pub mut:
+	root map[string]Any
 }
 
-// the same with json.encode
-pub fn encode(obj voidptr) ?string {
+pub fn (mut e Encoder) encode() {
 }
