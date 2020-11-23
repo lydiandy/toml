@@ -1,34 +1,34 @@
 module toml
 
 pub struct Token {
-	kind    Kind
-	val     Value  //only string,integer,float,datetime have val
-	len 	int
+	kind Kind
+	val  string // only name,string,integer,float,datetime
+	len  int
 }
 
 pub enum Kind {
-	unknown				//unknown token
-	eol 				//end of line
-	name 				//ident
-	eq					//=
-	bool_true				
+	unknown // unknown token
+	eof // end of file
+	name // ident
+	eq // =
+	bool_true
 	bool_false
-	string				//string
+	string // string
 	number
-	datetime			//TODO
-	dot 				// .
-	comma				// ,
-	lsbr 				// [
-	rsbr 				// ]
-	double_lsbr 		// [[
-	double_rsbr 		// ]]
-	lcbr				// {
-	rcbr 				// }
-	plus   				// +
-	minus				// -
-	// backslash			// \
-	// inf         		// inf or +inf
-	// _inf				// -inf
-	// nan					// nan or +nan
-	// _nan				// -nan
+	datetime // TODO
+	dot // .
+	comma // ,
+	lsbr // [
+	rsbr // ]
+	double_lsbr // [[
+	double_rsbr // ]]
+	lcbr // {
+	rcbr // }
+	plus // +
+	minus // -
+	backslash // \
+	inf // inf or +inf
+	_inf // -inf
+	nan // nan or +nan
+	_nan // -nan
 }
